@@ -196,6 +196,15 @@ internal class Abs : MonoBehaviour {
         _spikeMasterControl.GetAction<WaitRandom>("Wave R", 7).timeMin = 0.1f;
         _spikeMasterControl.GetAction<WaitRandom>("Wave R", 7).timeMax = 0.1f;
         _spikeMasterControl.SetState("Spike Waves");
+        foreach (Transform item in _spikeMaster.transform)
+		{
+            foreach (Transform item2 in item.gameObject.transform)
+            {
+                GameObject gameObject = item2.gameObject;
+                gameObject.GetComponent<DamageHero>().damageDealt = 2;
+                gameObject.GetComponent<DamageHero>().hazardType = 0;
+            }
+		}
 
         // first phase teleport range
         _control.FsmVariables.FindFsmFloat("A1 X Min").Value -= 5f;
