@@ -134,7 +134,6 @@ internal class Abs : MonoBehaviour {
         _attackChoices.GetAction<SendEventByName>("Nail Top Sweep", 2).delay = 0.7f;
         _attackChoices.GetAction<SendEventByName>("Nail Top Sweep", 3).delay = 1.05f;
         _attackChoices.GetAction<Wait>("Nail Top Sweep", 4).time = 3f;
-        _attackChoices.GetAction<Wait>("Nail Top Sweep", 4).time = 5f;
         _attackChoices.InsertAction("Nail Top Sweep", new SendEventByName{
             eventTarget = _attackChoices.GetAction<SendEventByName>("Nail Top Sweep", 2).eventTarget,
             sendEvent = "COMB TOP",
