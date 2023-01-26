@@ -25,20 +25,13 @@ internal class Abs : MonoBehaviour {
     private GameObject[] _spikeset2;
     private GameObject[] _spikeset3;
     private GameObject ascendBeam = null;
-    private GameObject eyeBeamGlow = null;
     private int CWRepeats = 0;
-    private bool fullSpikesSet = false;
     private bool disableBeamSet = false;
     private bool arena2Set = false;
     private bool onePlatSet = false;
     private bool noPlatsSet = false;
-    private bool platSpikesSet = false;
     private bool finalDanceOrbsConfigured = false;
     private bool finalDanceExtraAttackConfigured = false;
-    private const int fullSpikesHealth = 750;
-    private const int onePlatHealth = 500;
-    private const int platSpikesHealth = 500;
-    private const float nailWallDelay = 0.8f;
 
     private void Awake() {
         Log("Added AbsRad MonoBehaviour");
@@ -100,12 +93,15 @@ internal class Abs : MonoBehaviour {
         _attackCommands.GetAction<FloatAdd>("CCW Spawn", 2).add.Value = 20f;
 
         // beam sweep
-        _attackChoices.GetAction<Wait>("Beam Sweep L", 0).time = 0.5f;
-        _attackChoices.GetAction<Wait>("Beam Sweep R", 0).time = 0.5f;
-        _attackChoices.ChangeTransition("A1 Choice", "BEAM SWEEP R", "Beam Sweep L");
-        _attackChoices.ChangeTransition("A2 Choice", "BEAM SWEEP R", "Beam Sweep L 2");
-        _attackChoices.GetAction<SendEventByName>("Beam Sweep L 2", 1).sendEvent = "BEAM SWEEP L";
-        _attackChoices.GetAction<SendEventByName>("Beam Sweep R 2", 1).sendEvent = "BEAM SWEEP R";
+        // (refactoring this actually introduces bugs so it has to be left as-is for now)
+        FsmutilExt.GetAction<Wait>(_attackChoices, "Beam Sweep L", 0).time = 0.5f;
+		FsmutilExt.GetAction<Wait>(_attackChoices, "Beam Sweep R", 0).time = 0.5f;
+		FsmutilExt.ChangeTransition(_attackChoices, "A1 Choice", "BEAM SWEEP R", "Beam Sweep L");
+		FsmutilExt.ChangeTransition(_attackChoices, "A2 Choice", "BEAM SWEEP R", "Beam Sweep L 2");
+		FsmutilExt.GetAction<SendEventByName>(_attackChoices, "Beam Sweep L 2", 1).sendEvent = "BEAM SWEEP L";
+		FsmutilExt.GetAction<SendEventByName>(_attackChoices, "Beam Sweep R 2", 1).sendEvent = "BEAM SWEEP R";
+
+        // beam burst
         _attackCommands.GetAction<SendEventByName>("EB 1", 9).delay = 0.3f;
         _attackCommands.GetAction<Wait>("EB 1", 10).time = 0.5f;
         _attackCommands.GetAction<SendEventByName>("EB 2", 9).delay = 0.3f;
@@ -172,7 +168,7 @@ internal class Abs : MonoBehaviour {
 
         // add shake to teleport
         _teleport.GetAction<SendEventByName>("Arrive", 5).eventTarget = _control.GetAction<SendEventByName>("Stun1 Out", 9).eventTarget;
-        _teleport.GetAction<SendEventByName>("Arrive", 5).sendEvent = "AverageShake";
+        _teleport.GetAction<SendEventByName>("Arrive", 5).sendEvent = "SmallShake";
 
         // first phase spikes
         _spikeMasterControl.GetAction<SendEventByName>("Spikes Left", 0).sendEvent = "UP";
@@ -271,6 +267,7 @@ internal class Abs : MonoBehaviour {
         // final phase
         _attackCommands.RemoveAction("Set Final Orbs", 0);
         GameObject.Find("Radiant Plat Small (11)").LocateMyFSM("radiant_plat").GetAction<Wait>("Vanish Antic", 1).time = 3.5f;
+
         Log("fin.");
     }
 
@@ -294,7 +291,7 @@ internal class Abs : MonoBehaviour {
             CWRepeats = 0;
         }
 
-        // do something with the beam sweepers idk
+        // create second beam during beam sweep attack
         if (_beamsweepercontrol.ActiveStateName == _beamsweeper2control.ActiveStateName)
         {
             string activeStateName = _beamsweepercontrol.ActiveStateName;
@@ -305,21 +302,21 @@ internal class Abs : MonoBehaviour {
                 {
                     if (text == "Beam Sweep R")
                     {
-                        _beamsweeper2control.ChangeState(GetFsmEventByName(_beamsweeper2control, "BEAM SWEEP L"));
+                        _beamsweeper2control.SendEvent("BEAM SWEEP L");
                     }
                 }
                 else
                 {
-                    _beamsweeper2control.ChangeState(GetFsmEventByName(_beamsweeper2control, "BEAM SWEEP R"));
+                    _beamsweeper2control.SendEvent("BEAM SWEEP R");
                 }
             }
         }
 
-        // disable beams shortly before sword rain phase starts (probably does not work in all AnyRads)
+        // disable single beam sweep attack during platform phase
         if (_hm.hp < _phaseControl.FsmVariables.GetFsmInt("P3 A1 Rage").Value + 30 && !disableBeamSet) {
             disableBeamSet = true;
-            FsmutilExt.ChangeTransition(_attackChoices, "A1 Choice", "BEAM SWEEP L", "Orb Wait");
-            FsmutilExt.ChangeTransition(_attackChoices, "A1 Choice", "BEAM SWEEP R", "Eye Beam Wait");
+            SFCore.Utils.FsmUtil.ChangeTransition(_attackChoices, "A1 Choice", "BEAM SWEEP L", "Orb Wait");
+            SFCore.Utils.FsmUtil.ChangeTransition(_attackChoices, "A1 Choice", "BEAM SWEEP R", "Eye Beam Wait");
         }
 
         // plat phase beam attack
@@ -352,19 +349,13 @@ internal class Abs : MonoBehaviour {
             }
         }
 
-        // Respawn platform in platform phase
+        // respawn platform in platform phase
         if (arena2Set && GameObject.Find("Hazard Plat/Radiant Plat Wide (4)").LocateMyFSM("radiant_plat").ActiveStateName == "Appear 2") {
             GameObject.Find("Hazard Plat/Radiant Plat Wide (4)").LocateMyFSM("radiant_plat").SendEvent("SLOW VANISH");
         }
 
-        // get references to ascend beam attack components for use in final phase
         if (!(base.gameObject.transform.position.y >= 150f)) {
-            if (eyeBeamGlow == null) {
-                eyeBeamGlow = GameObject.Find("Eye Beam Glow");
-            }
-            // GameObject beam = GameObject.Find("Ascend Beam");
             if (ascendBeam == null) {
-                // ascendBeam = Object.Instantiate(beam);
                 ascendBeam = GameObject.Find("Ascend Beam");
             }
         }
@@ -382,17 +373,9 @@ internal class Abs : MonoBehaviour {
 
             // add beam attack actions to the teleport sequence
             _control.AddAction("Final Idle", _attackCommands.GetAction<ActivateGameObject>("AB Start", 0));
-            _control.AddAction("Final Idle", _attackCommands.GetAction("Aim", 0));
-            _control.AddAction("Final Idle", _attackCommands.GetAction("Aim", 1));
-            _control.AddAction("Final Idle", _attackCommands.GetAction("Aim", 2));
-            _control.AddAction("Final Idle", _attackCommands.GetAction("Aim", 3));
-            _control.AddAction("Final Idle", _attackCommands.GetAction("Aim", 4));
-            _control.AddAction("Final Idle", _attackCommands.GetAction("Aim", 5));
-            _control.AddAction("Final Idle", _attackCommands.GetAction("Aim", 6));
-            _control.AddAction("Final Idle", _attackCommands.GetAction("Aim", 7));
-            _control.AddAction("Final Idle", _attackCommands.GetAction("Aim", 8));
-            _control.AddAction("Final Idle", _attackCommands.GetAction("Aim", 9));
-            _control.AddAction("Final Idle", _attackCommands.GetAction("Aim", 10));
+            for (int i = 0; i <= 10; i++) {
+                _control.AddAction("Final Idle", _attackCommands.GetAction("Aim", i));
+            }
             _control.InsertAction("A2 Tele Choice 2", new ActivateGameObject{
                 gameObject = _attackCommands.GetAction<ActivateGameObject>("AB Start", 0).gameObject,
                 activate = false,
@@ -436,16 +419,6 @@ internal class Abs : MonoBehaviour {
             delay = delay,
             everyFrame = false
         }, index);
-    }
-
-    private static FsmEvent GetFsmEventByName(PlayMakerFSM fsm, string eventName) {
-        FsmEvent[] fsmEvents = fsm.FsmEvents;
-        foreach (FsmEvent fsmEvent in fsmEvents) {
-            if (fsmEvent.Name == eventName) {
-                return fsmEvent;
-            }
-        }
-        return null;
     }
 
     private static void Log(object obj) {
