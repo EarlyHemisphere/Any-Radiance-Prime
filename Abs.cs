@@ -93,13 +93,14 @@ internal class Abs : MonoBehaviour {
         _attackCommands.GetAction<FloatAdd>("CCW Spawn", 2).add.Value = 20f;
 
         // beam sweep
-        // (refactoring this actually introduces bugs so it has to be left as-is for now)
-        FsmutilExt.GetAction<Wait>(_attackChoices, "Beam Sweep L", 0).time = 0.5f;
-		FsmutilExt.GetAction<Wait>(_attackChoices, "Beam Sweep R", 0).time = 0.5f;
-		FsmutilExt.ChangeTransition(_attackChoices, "A1 Choice", "BEAM SWEEP R", "Beam Sweep L");
-		FsmutilExt.ChangeTransition(_attackChoices, "A2 Choice", "BEAM SWEEP R", "Beam Sweep L 2");
-		FsmutilExt.GetAction<SendEventByName>(_attackChoices, "Beam Sweep L 2", 1).sendEvent = "BEAM SWEEP L";
-		FsmutilExt.GetAction<SendEventByName>(_attackChoices, "Beam Sweep R 2", 1).sendEvent = "BEAM SWEEP R";
+        _attackChoices.GetAction<Wait>("Beam Sweep L", 0).time = 0.5f;
+		_attackChoices.GetAction<Wait>("Beam Sweep R", 0).time = 0.5f;
+		_attackChoices.ChangeTransition("A1 Choice", "BEAM SWEEP R", "Beam Sweep L");
+		_attackChoices.ChangeTransition("A2 Choice", "BEAM SWEEP R", "Beam Sweep L 2");
+		_attackChoices.GetAction<SendEventByName>("Beam Sweep L 2", 1).sendEvent = "BEAM SWEEP L";
+		_attackChoices.GetAction<SendEventByName>("Beam Sweep R 2", 1).sendEvent = "BEAM SWEEP R";
+        _attackChoices.GetAction<Wait>("Beam Sweep L 2", 0).time = 3.5f;
+		_attackChoices.GetAction<Wait>("Beam Sweep R 2", 0).time = 3.5f;
 
         // beam burst
         _attackCommands.GetAction<SendEventByName>("EB 1", 9).delay = 0.3f;
@@ -315,8 +316,8 @@ internal class Abs : MonoBehaviour {
         // disable single beam sweep attack during platform phase
         if (_hm.hp < _phaseControl.FsmVariables.GetFsmInt("P3 A1 Rage").Value + 30 && !disableBeamSet) {
             disableBeamSet = true;
-            SFCore.Utils.FsmUtil.ChangeTransition(_attackChoices, "A1 Choice", "BEAM SWEEP L", "Orb Wait");
-            SFCore.Utils.FsmUtil.ChangeTransition(_attackChoices, "A1 Choice", "BEAM SWEEP R", "Eye Beam Wait");
+            _attackChoices.ChangeTransition("A1 Choice", "BEAM SWEEP L", "Orb Wait");
+			_attackChoices.ChangeTransition("A1 Choice", "BEAM SWEEP R", "Eye Beam Wait");
         }
 
         // plat phase beam attack
