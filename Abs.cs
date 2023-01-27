@@ -200,7 +200,6 @@ internal class Abs : MonoBehaviour {
             foreach (Transform spike in spikeGroup.gameObject.transform) {
                 GameObject gameObject = spike.gameObject;
                 gameObject.GetComponent<DamageHero>().damageDealt = 2;
-                gameObject.GetComponent<DamageHero>().hazardType = 0;
             }
 		}
 
