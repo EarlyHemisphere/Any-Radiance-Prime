@@ -2,12 +2,12 @@
 using ModCommon.Util;
 using UnityEngine;
 
-namespace AnyRadiance {
+namespace AnyRadiancePrime {
     internal class BeamSweeperClone : MonoBehaviour {
         private PlayMakerFSM _control;
 
         private void Awake() {
-            AnyRadiance.instance.Log("Added BeamSweeperClone MonoBehaviour");
+            AnyRadiancePrime.instance.Log("Added BeamSweeperClone MonoBehaviour");
             _control = gameObject.LocateMyFSM("Control");
         }
 

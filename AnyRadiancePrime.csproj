@@ -8,15 +8,15 @@
     <!--<DocumentationFile>$(OutputPath)/$(AssemblyTitle).xml</DocumentationFile>-->
   </PropertyGroup>
   <PropertyGroup>
-    <RootNamespace>AnyRadiance</RootNamespace>
-    <AssemblyName>AnyRadiance</AssemblyName>
+    <RootNamespace>AnyRadiancePrime</RootNamespace>
+    <AssemblyName>AnyRadiancePrime</AssemblyName>
     <TargetFramework>net472</TargetFramework>
-    <AssemblyTitle>AnyRadiance</AssemblyTitle>
-    <Product>AnyRadiance</Product>
+    <AssemblyTitle>AnyRadiancePrime</AssemblyTitle>
+    <Product>AnyRadiancePrime</Product>
     <Description>A Hollow Knight Mod</Description>
     <Copyright>Copyright © 2023</Copyright>
-    <AssemblyVersion>1.0.0.0</AssemblyVersion>
-    <FileVersion>1.0.0.0</FileVersion>
+    <AssemblyVersion>1.0.4.0</AssemblyVersion>
+    <FileVersion>1.0.4.0</FileVersion>
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>

@@ -1,5 +1,5 @@
 ﻿using ModCommon.Util;
-using AnyRadiance;
+using AnyRadiancePrime;
 using UnityEngine;
 using HutongGames.PlayMaker;
 using HutongGames.PlayMaker.Actions;
