@@ -27,6 +27,7 @@ internal class Abs : MonoBehaviour {
     private GameObject ascendBeam = null;
     private int CWRepeats = 0;
     private bool disableBeamSet = false;
+    private bool swordRainSpikesSet = false;
     private bool arena2Set = false;
     private bool onePlatSet = false;
     private bool noPlatsSet = false;
@@ -196,11 +197,9 @@ internal class Abs : MonoBehaviour {
         _spikeMasterControl.GetAction<WaitRandom>("Wave R", 7).timeMin = 0.1f;
         _spikeMasterControl.GetAction<WaitRandom>("Wave R", 7).timeMax = 0.1f;
         _spikeMasterControl.SetState("Spike Waves");
-        foreach (Transform item in _spikeMaster.transform)
-		{
-            foreach (Transform item2 in item.gameObject.transform)
-            {
-                GameObject gameObject = item2.gameObject;
+        foreach (Transform spikeGroup in _spikeMaster.transform) {
+            foreach (Transform spike in spikeGroup.gameObject.transform) {
+                GameObject gameObject = spike.gameObject;
                 gameObject.GetComponent<DamageHero>().damageDealt = 2;
                 gameObject.GetComponent<DamageHero>().hazardType = 0;
             }
@@ -276,6 +275,10 @@ internal class Abs : MonoBehaviour {
         // final phase
         _attackCommands.RemoveAction("Set Final Orbs", 0);
         GameObject.Find("Radiant Plat Small (11)").LocateMyFSM("radiant_plat").GetAction<Wait>("Vanish Antic", 1).time = 3.5f;
+        // teleport y positions moved down by 1.3
+        _control.GetAction<SetVector3Value>("Tele 11", 1).vector3Value = new Vector3(62.94f, 157.35f, 0.006f);
+        _control.GetAction<SetVector3Value>("Tele 12", 1).vector3Value = new Vector3(53.88f, 157.35f, 0.006f);
+        _control.GetAction<SetVector3Value>("Tele 13", 1).vector3Value = new Vector3(72.4f, 157.35f, 0.006f);
 
         Log("fin.");
     }
@@ -326,6 +329,16 @@ internal class Abs : MonoBehaviour {
             disableBeamSet = true;
             _attackChoices.ChangeTransition("A1 Choice", "BEAM SWEEP L", "Orb Wait");
 			_attackChoices.ChangeTransition("A1 Choice", "BEAM SWEEP R", "Eye Beam Wait");
+        }
+
+        // set damage of spikes to 1 during sword rain phase
+        if (_hm.hp < _phaseControl.FsmVariables.GetFsmInt("P3 A1 Rage").Value && !swordRainSpikesSet) {
+            swordRainSpikesSet = true;
+            foreach (Transform spikeGroup in _spikeMaster.transform) {
+                foreach (Transform spike in spikeGroup.gameObject.transform) {
+                    spike.gameObject.GetComponent<DamageHero>().damageDealt = 1;
+                }
+            }
         }
 
         // plat phase beam attack
