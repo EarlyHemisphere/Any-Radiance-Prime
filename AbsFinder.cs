@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using AnyRadiancePrime;
 
 internal class AbsFinder : MonoBehaviour {
     private GameObject _abs;

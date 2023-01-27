@@ -1,5 +1,4 @@
 ﻿using ModCommon.Util;
-using AnyRadiancePrime;
 using UnityEngine;
 using HutongGames.PlayMaker;
 using HutongGames.PlayMaker.Actions;
@@ -275,10 +274,10 @@ internal class Abs : MonoBehaviour {
         // final phase
         _attackCommands.RemoveAction("Set Final Orbs", 0);
         GameObject.Find("Radiant Plat Small (11)").LocateMyFSM("radiant_plat").GetAction<Wait>("Vanish Antic", 1).time = 3.5f;
-        // teleport y positions moved down by 1.3
-        _control.GetAction<SetVector3Value>("Tele 11", 1).vector3Value = new Vector3(62.94f, 157.35f, 0.006f);
-        _control.GetAction<SetVector3Value>("Tele 12", 1).vector3Value = new Vector3(53.88f, 157.35f, 0.006f);
-        _control.GetAction<SetVector3Value>("Tele 13", 1).vector3Value = new Vector3(72.4f, 157.35f, 0.006f);
+        // teleport y positions moved down by 1
+        _control.GetAction<SetVector3Value>("Tele 11", 1).vector3Value = new Vector3(62.94f, 157.65f, 0.006f);
+        _control.GetAction<SetVector3Value>("Tele 12", 1).vector3Value = new Vector3(53.88f, 157.65f, 0.006f);
+        _control.GetAction<SetVector3Value>("Tele 13", 1).vector3Value = new Vector3(72.4f, 157.65f, 0.006f);
 
         Log("fin.");
     }

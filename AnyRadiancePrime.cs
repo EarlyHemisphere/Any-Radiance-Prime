@@ -3,7 +3,6 @@ using System.Reflection;
 using Modding;
 using UnityEngine;
 using GlobalEnums;
-using AnyRadiancePrime;
 
 public class AnyRadiancePrime : Mod, ITogglableMod {
     public static AnyRadiancePrime instance;
