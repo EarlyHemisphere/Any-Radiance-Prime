@@ -47,10 +47,10 @@ public class AnyRadiancePrime : Mod, ITogglableMod {
     private static int CreateRespawn(int hazardType, int damage) {
         GameObject absRad = GameObject.Find("Absolute Radiance");
         if ((HazardType)hazardType == HazardType.ACID && absRad != null) {
-            if (absRad.transform.GetPositionY() > 150f) {
+            if (absRad.transform.GetPositionY() > 150f && GameObject.Find("Knight").transform.GetPositionY() > 60f) {
                 // respawn final phase platform on death to abyss pit
                 GameObject.Find("Radiant Plat Small (11)").LocateMyFSM("radiant_plat").SendEvent("APPEAR");
-            } else if (GameObject.Find("Phase2 Detector") != null && GameObject.Find("Phase2 Detector").activeSelf) {
+            } else if (absRad.LocateMyFSM("Attack Choices").FsmVariables.GetFsmInt("Arena").Value == 2) {
                 // respawn platform phase platform on death to abyss pit
                 GameObject.Find("Hazard Plat/Radiant Plat Wide (4)").LocateMyFSM("radiant_plat").SendEvent("APPEAR");
             }
@@ -62,6 +62,7 @@ public class AnyRadiancePrime : Mod, ITogglableMod {
         ModHooks.AfterSavegameLoadHook -= AfterSaveGameLoad;
         ModHooks.NewGameHook -= AddComponent;
         ModHooks.LanguageGetHook -= LangGet;
+        ModHooks.AfterTakeDamageHook -= CreateRespawn;
         GameManager instance = GameManager.instance;
         AbsFinder absFinder = ((instance != null) ? instance.gameObject.GetComponent<AbsFinder>() : null);
         if (!(absFinder == null))
